@@ -1,4 +1,3 @@
-import 'package:chatme/constantes.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/customwidgets/textstylescustom.dart';
 import 'package:flutter/cupertino.dart';

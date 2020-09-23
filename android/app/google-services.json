@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "916715382120",
+    "firebase_url": "https://chatme-a5cb8.firebaseio.com",
+    "project_id": "chatme-a5cb8",
+    "storage_bucket": "chatme-a5cb8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:916715382120:android:f989539439b9056945a2dd",
+        "android_client_info": {
+          "package_name": "com.ricardonuga.chatme"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "916715382120-hsdiepolcvj4t9dc3minro94ftlmh0v0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ricardonuga.chatme",
+            "certificate_hash": "a1ccf18a8e952d8d9e42ae2307ff8c74d41e4f8e"
+          }
+        },
+        {
+          "client_id": "916715382120-bbvu3qrnsprqcv0cdh5tgq2pk0eu35pk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkdSDtUIEy8rVV8qT83-AmVfr4w-ijrKc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "916715382120-bbvu3qrnsprqcv0cdh5tgq2pk0eu35pk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
