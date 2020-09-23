@@ -1,9 +1,12 @@
-import 'package:chatme/constantes.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/customwidgets/textstylescustom.dart';
+import 'package:chatme/telas/telamensagens.dart';
+import 'package:chatme/telas/telaregisto.dart';
 import 'package:flutter/material.dart';
 
 class TelaLogin extends StatefulWidget {
+  static const String id = 'tela_login';
+
   @override
   _TelaLoginState createState() => _TelaLoginState();
 }
@@ -31,11 +34,15 @@ class _TelaLoginState extends State<TelaLogin> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     textFieldCustom(
+                      padHorizontal: 16.0,
+                      padVertical: 16.0,
                       esconderTexto: false,
                       icone: Icons.person_outline,
                       textoHint: 'Introduza o seu email',
                     ),
                     textFieldCustom(
+                      padHorizontal: 16.0,
+                      padVertical: 16.0,
                       esconderTexto: true,
                       icone: Icons.lock_outline,
                       textoHint: 'Introduza a sua password',
@@ -57,7 +64,7 @@ class _TelaLoginState extends State<TelaLogin> {
                             ),
                           ),
                           onPressed: () =>
-                              Navigator.pushNamed(context, '/first'),
+                              Navigator.pushNamed(context, TelaMensagens.id),
                         ),
                         SizedBox(
                           width: 50.0,
@@ -65,7 +72,7 @@ class _TelaLoginState extends State<TelaLogin> {
                         outlineButtonCustom(
                           texto: 'Registar',
                           onPress: () {
-                            Navigator.pushNamed(context, '/second');
+                            Navigator.pushNamed(context, TelaRegisto.id);
                           },
                         ),
                       ],

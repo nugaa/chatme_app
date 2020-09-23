@@ -23,19 +23,22 @@ Row customAppbar({@required String titulo}) {
         ),
       ),
       customIconButton(
+        cor: Colors.white,
         icone: Icons.menu,
         tamanho: 35.0,
-        onPress: () {},
+        onPress: () {
+          //TODO: DEFINIÇÕES DE CONTA
+        },
       ),
     ],
   );
 }
 
 IconButton customIconButton(
-    {IconData icone, double tamanho, Function onPress}) {
+    {IconData icone, double tamanho, Function onPress, Color cor}) {
   return IconButton(
     icon: Icon(icone),
-    color: Colors.white,
+    color: cor,
     splashColor: Colors.transparent,
     highlightColor: Colors.transparent,
     iconSize: tamanho,
@@ -161,9 +164,12 @@ Padding textFieldCustom({
   bool esconderTexto,
   IconData icone,
   String textoHint,
+  double padHorizontal,
+  double padVertical,
 }) {
   return Padding(
-    padding: const EdgeInsets.all(16.0),
+    padding:
+        EdgeInsets.symmetric(horizontal: padHorizontal, vertical: padVertical),
     child: Container(
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
@@ -226,3 +232,39 @@ OutlineButton outlineButtonCustom({String texto, Function onPress}) {
     onPressed: onPress,
   );
 }
+
+Row separador = Row(
+  children: <Widget>[
+    Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8.0,
+        ),
+        child: Divider(
+          thickness: 1.0,
+          color: corUserMsg,
+        ),
+      ),
+    ),
+    Text(
+      'OU',
+      style: textFieldStyle(
+        tamanho: 16,
+        cor: corUserMsg,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8.0,
+          vertical: 8.0,
+        ),
+        child: Divider(
+          thickness: 1.0,
+          color: corUserMsg,
+        ),
+      ),
+    ),
+  ],
+);

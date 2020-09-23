@@ -24,11 +24,11 @@ class MyApp extends StatelessWidget {
           buttonColor: corBotao,
         ),
       ),
-      initialRoute: '/',
+      initialRoute: TelaLogin.id,
       routes: {
-        '/': (context) => TelaLogin(),
-        '/first': (context) => TelaMensagens(),
-        '/second': (context) => TelaRegisto(),
+        TelaLogin.id: (context) => TelaLogin(),
+        TelaMensagens.id: (context) => TelaMensagens(),
+        TelaRegisto.id: (context) => TelaRegisto(),
       },
     );
   }

@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TelaMensagens extends StatefulWidget {
+  static const String id = 'tela_mensagens';
+
   @override
   _TelaMensagensState createState() => _TelaMensagensState();
 }
@@ -36,33 +38,7 @@ class _TelaMensagensState extends State<TelaMensagens> {
               padding: const EdgeInsets.all(16.0),
               child: customAppbar(titulo: 'Minhas Mensagens'),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0, right: 16.0),
-              child: TextField(
-                style: textFieldStyle(
-                  tamanho: 16.0,
-                  fontWeight: FontWeight.normal,
-                  cor: Colors.white,
-                ),
-                cursorColor: Colors.white,
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  suffixIcon: customIconButton(
-                    icone: Icons.search,
-                    tamanho: 30,
-                    onPress: () {
-                      //TODO: ONPRESS botao procurar textField
-                    },
-                  ),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.white,
-                    ),
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-            ),
+            _barraPesquisa,
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -77,10 +53,11 @@ class _TelaMensagensState extends State<TelaMensagens> {
                     ),
                   ),
                   customIconButton(
+                    cor: Colors.white,
                     icone: Icons.more_horiz,
                     tamanho: 35.0,
                     onPress: () {
-                      //TODO: onPress 3 pontinhos dos contactos
+                      //TODO: onPress MOSTRAR TODOS CONTACTOS NUMA LISTA
                     },
                   ),
                 ],
@@ -143,3 +120,33 @@ class _TelaMensagensState extends State<TelaMensagens> {
     );
   }
 }
+
+Widget _barraPesquisa = Padding(
+  padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+  child: TextField(
+    style: textFieldStyle(
+      tamanho: 16.0,
+      fontWeight: FontWeight.normal,
+      cor: Colors.white,
+    ),
+    cursorColor: Colors.white,
+    textAlign: TextAlign.center,
+    decoration: InputDecoration(
+      suffixIcon: customIconButton(
+        cor: Colors.white,
+        icone: Icons.search,
+        tamanho: 30,
+        onPress: () {
+          //TODO: ONPRESS botao procurar textField
+        },
+      ),
+      border: OutlineInputBorder(
+        borderSide: BorderSide(
+          color: Colors.white,
+          width: 2.0,
+        ),
+        borderRadius: BorderRadius.circular(30.0),
+      ),
+    ),
+  ),
+);
