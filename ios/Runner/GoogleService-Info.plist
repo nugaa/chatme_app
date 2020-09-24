@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>916715382120-67qt7da3u6v0vnl7mg9776tds15m4tga.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.916715382120-67qt7da3u6v0vnl7mg9776tds15m4tga</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>916715382120-hsdiepolcvj4t9dc3minro94ftlmh0v0.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyDaK2Y1HMk2Wp4hFla2NHy2EdBZZ1WBL48</string>
+	<key>GCM_SENDER_ID</key>
+	<string>916715382120</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.ricardonuga.chatme</string>
+	<key>PROJECT_ID</key>
+	<string>chatme-a5cb8</string>
+	<key>STORAGE_BUCKET</key>
+	<string>chatme-a5cb8.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:916715382120:ios:22da4415f2e651d245a2dd</string>
+	<key>DATABASE_URL</key>
+	<string>https://chatme-a5cb8.firebaseio.com</string>
+</dict>
+</plist>

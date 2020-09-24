@@ -12,6 +12,9 @@ class TelaLogin extends StatefulWidget {
 }
 
 class _TelaLoginState extends State<TelaLogin> {
+  String email;
+  String password;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,19 +37,24 @@ class _TelaLoginState extends State<TelaLogin> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     textFieldCustom(
-                      padHorizontal: 16.0,
-                      padVertical: 16.0,
-                      esconderTexto: false,
-                      icone: Icons.person_outline,
-                      textoHint: 'Introduza o seu email',
-                    ),
+                        padHorizontal: 16.0,
+                        padVertical: 16.0,
+                        esconderTexto: false,
+                        icone: Icons.person_outline,
+                        textoHint: 'Introduza o seu email',
+                        textInput: TextInputType.emailAddress,
+                        onChange: (value) {
+                          email = value;
+                        }),
                     textFieldCustom(
-                      padHorizontal: 16.0,
-                      padVertical: 16.0,
-                      esconderTexto: true,
-                      icone: Icons.lock_outline,
-                      textoHint: 'Introduza a sua password',
-                    ),
+                        padHorizontal: 16.0,
+                        padVertical: 16.0,
+                        esconderTexto: true,
+                        icone: Icons.lock_outline,
+                        textoHint: 'Introduza a sua password',
+                        onChange: (value) {
+                          password = value;
+                        }),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[

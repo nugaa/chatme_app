@@ -166,10 +166,15 @@ Padding textFieldCustom({
   String textoHint,
   double padHorizontal,
   double padVertical,
+  Function onChange,
+  TextInputType textInput,
+  TextEditingController control,
 }) {
   return Padding(
-    padding:
-        EdgeInsets.symmetric(horizontal: padHorizontal, vertical: padVertical),
+    padding: EdgeInsets.symmetric(
+        horizontal:
+            padHorizontal == null ? padHorizontal = 12.0 : padHorizontal,
+        vertical: padVertical == null ? padVertical = 6.0 : padVertical),
     child: Container(
       decoration: ShapeDecoration(
         shape: RoundedRectangleBorder(
@@ -185,6 +190,8 @@ Padding textFieldCustom({
           horizontal: 35.0,
         ),
         child: TextField(
+          controller: control,
+          keyboardType: textInput == null ? TextInputType.text : textInput,
           cursorColor: Colors.white,
           textAlignVertical: TextAlignVertical.center,
           style: textFieldStyle(
@@ -204,6 +211,7 @@ Padding textFieldCustom({
             ),
             border: InputBorder.none,
           ),
+          onChanged: onChange,
         ),
       ),
     ),
