@@ -1,7 +1,11 @@
+import 'package:chatme/comparar_regex.dart';
 import 'package:chatme/customwidgets/alertcustom.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
+import 'package:chatme/networking/servicos_firebase.dart';
+import 'package:chatme/telas/telalogin.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import '../constantes.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -14,24 +18,36 @@ class TelaRegisto extends StatefulWidget {
 }
 
 class _TelaRegistoState extends State<TelaRegisto> {
+  CompararRegex compararRegex = CompararRegex();
   Utilizador utilizador = Utilizador();
   TextEditingController _nomeControl = TextEditingController();
   TextEditingController _emailControl = TextEditingController();
   TextEditingController _passwordControl = TextEditingController();
   TextEditingController _passverificaControl = TextEditingController();
+  Color cor;
+  bool showSpinner = false;
 
-  final _auth = FirebaseAuth.instance;
+  void verificarEmail(String value) {
+    if (compararRegex.validarEmail(email: value) == true) {
+      utilizador.email = value;
+      cor = Colors.white;
+    } else {
+      cor = Colors.red;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomPadding: false,
       appBar: _appbar(
-        onPress: () => Navigator.popAndPushNamed(context, '/'),
+        onPress: () => Navigator.popAndPushNamed(context, TelaLogin.id),
       ), // _appbar
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: ModalProgressHUD(
+        inAsyncCall: showSpinner,
+        child: SafeArea(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               textFieldCustom(
                 control: _nomeControl,
@@ -43,14 +59,18 @@ class _TelaRegistoState extends State<TelaRegisto> {
                 },
               ),
               textFieldCustom(
-                  control: _emailControl,
-                  esconderTexto: false,
-                  icone: Icons.mail_outline,
-                  textoHint: 'Email',
-                  textInput: TextInputType.emailAddress,
-                  onChange: (value) {
-                    utilizador.email = value;
-                  }),
+                control: _emailControl,
+                esconderTexto: false,
+                icone: Icons.mail_outline,
+                textoHint: 'Email',
+                textInput: TextInputType.emailAddress,
+                onChange: (value) {
+                  setState(() {
+                    verificarEmail(value);
+                  });
+                },
+                corDoTexto: cor,
+              ),
               textFieldCustom(
                   control: _passwordControl,
                   esconderTexto: true,
@@ -70,22 +90,26 @@ class _TelaRegistoState extends State<TelaRegisto> {
               outlineButtonCustom(
                 texto: 'Criar Conta',
                 onPress: () async {
-                  //TODO: REGISTAR COM DADOS DAS TEXTFIELD
+                  //TODO: Falta aproveitar o Nome que está guardado no Utilizador
+
                   if (_passwordControl.text == _passverificaControl.text &&
                       _passwordControl.text.length >= 6) {
-                    try {
-                      final novoUser =
-                          await _auth.createUserWithEmailAndPassword(
-                              email: utilizador.email,
-                              password: utilizador.password);
-                    } catch (e) {
-                      print(e);
-                    }
+                    setState(() {
+                      showSpinner = true;
+                    });
+
+                    var mostrar = await ServicosFirebase()
+                        .registarEmailPassword(context, utilizador.email,
+                            utilizador.password, showSpinner);
+
+                    setState(() {
+                      showSpinner = mostrar;
+                    });
+
                     _passwordControl.clear();
                     _passverificaControl.clear();
                     _nomeControl.clear();
                     _emailControl.clear();
-                    Navigator.pop(context);
                   } else {
                     showDialog(
                       context: context,
@@ -106,31 +130,6 @@ class _TelaRegistoState extends State<TelaRegisto> {
                     );
                   }
                 },
-              ),
-              separador,
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  customIconButton(
-                    icone: FontAwesomeIcons.google,
-                    cor: corBotao,
-                    tamanho: 30.0,
-                    onPress: () {
-                      //TODO: REGISTAR COM GOOGLE
-                    },
-                  ),
-                  SizedBox(
-                    width: 15.0,
-                  ),
-                  customIconButton(
-                    icone: FontAwesomeIcons.facebook,
-                    cor: corBotao,
-                    tamanho: 30.0,
-                    onPress: () {
-                      //TODO: REGISTAR COM FACEBOOK
-                    },
-                  ),
-                ],
               ),
               Align(
                 alignment: Alignment.bottomCenter,

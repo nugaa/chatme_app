@@ -1,6 +1,7 @@
 import 'package:chatme/customwidgets/textstylescustom.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../constantes.dart';
 
@@ -39,7 +40,7 @@ IconButton customIconButton(
   return IconButton(
     icon: Icon(icone),
     color: cor,
-    splashColor: Colors.transparent,
+    splashColor: corUserMsg,
     highlightColor: Colors.transparent,
     iconSize: tamanho,
     onPressed: onPress,
@@ -169,6 +170,7 @@ Padding textFieldCustom({
   Function onChange,
   TextInputType textInput,
   TextEditingController control,
+  Color corDoTexto,
 }) {
   return Padding(
     padding: EdgeInsets.symmetric(
@@ -196,7 +198,7 @@ Padding textFieldCustom({
           textAlignVertical: TextAlignVertical.center,
           style: textFieldStyle(
             tamanho: 14.0,
-            cor: Colors.white,
+            cor: corDoTexto == null ? corDoTexto = Colors.white : corDoTexto,
           ),
           obscureText: esconderTexto,
           decoration: InputDecoration(

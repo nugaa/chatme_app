@@ -1,5 +1,6 @@
 import 'package:chatme/telas/telalogin.dart';
 import 'package:chatme/telas/telamensagens.dart';
+import 'package:chatme/telas/telaprimeirologin.dart';
 import 'package:chatme/telas/telaregisto.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,10 @@ class _AppState extends State<App> {
 
     // Show a loader until FlutterFire is initialized
     if (!_iniciar) {
-      return Center(child: CircularProgressIndicator());
+      return Center(
+          child: CircularProgressIndicator(
+        backgroundColor: corBotao,
+      ));
     }
 
     return MaterialApp(
@@ -60,6 +64,7 @@ class _AppState extends State<App> {
         TelaLogin.id: (context) => TelaLogin(),
         TelaMensagens.id: (context) => TelaMensagens(),
         TelaRegisto.id: (context) => TelaRegisto(),
+        TelaPrimeiroLogin.id: (context) => TelaPrimeiroLogin(),
       },
     );
   }

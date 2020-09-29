@@ -1,7 +1,11 @@
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/customwidgets/textstylescustom.dart';
+import 'package:chatme/networking/servicos_firebase.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../constantes.dart';
 
 class TelaMensagens extends StatefulWidget {
   static const String id = 'tela_mensagens';
@@ -25,6 +29,13 @@ class _TelaMensagensState extends State<TelaMensagens> {
     contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
     contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    ServicosFirebase().obterUtilizador();
+  }
 
   @override
   Widget build(BuildContext context) {
