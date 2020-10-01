@@ -1,9 +1,9 @@
-import 'package:chatme/telas/telamensagens.dart';
+import 'package:chatme/telas/telahome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:chatme/telas/telaprimeirologin.dart';
 
-class ServicosFirebase {
+class ServicosFirebaseAuth {
   final _auth = FirebaseAuth.instance;
 
   Future registarEmailPassword(
@@ -28,7 +28,7 @@ class ServicosFirebase {
         email: email,
         password: password,
       );
-      Navigator.pushNamed(context, TelaMensagens.id);
+      Navigator.pushNamed(context, TelaHome.id);
       if (mostrar == true) {
         return false;
       }
@@ -42,18 +42,24 @@ class ServicosFirebase {
     }
   }
 
-  void obterUtilizador() async {
-    final _auth = FirebaseAuth.instance;
+  Future<String> obterUtilizador() async {
     User userLogado;
+    String emailUser;
     try {
       final user = await _auth.currentUser;
 
       if (user != null) {
         userLogado = user;
-        print(userLogado.email);
+        emailUser = userLogado.email;
       }
+      return emailUser;
     } catch (e) {
       print(e.message);
     }
+  }
+
+  logout(BuildContext contexto) {
+    _auth.signOut();
+    Navigator.pop(contexto);
   }
 }

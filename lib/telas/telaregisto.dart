@@ -1,13 +1,11 @@
 import 'package:chatme/comparar_regex.dart';
 import 'package:chatme/customwidgets/alertcustom.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
-import 'package:chatme/networking/servicos_firebase.dart';
+import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/telas/telalogin.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import '../constantes.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../utilizador.dart';
 
@@ -98,13 +96,9 @@ class _TelaRegistoState extends State<TelaRegisto> {
                       showSpinner = true;
                     });
 
-                    var mostrar = await ServicosFirebase()
+                    var mostrar = await ServicosFirebaseAuth()
                         .registarEmailPassword(context, utilizador.email,
                             utilizador.password, showSpinner);
-
-                    setState(() {
-                      showSpinner = mostrar;
-                    });
 
                     _passwordControl.clear();
                     _passverificaControl.clear();

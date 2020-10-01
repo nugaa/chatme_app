@@ -1,4 +1,4 @@
-import 'package:chatme/telas/telamensagens.dart';
+import 'package:chatme/telas/telahome.dart';
 import 'package:chatme/telas/telaprimeirologin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,7 @@ Future<UserCredential> signInWithGoogle(BuildContext context) async {
     if (authCredential.additionalUserInfo.isNewUser) {
       Navigator.pushNamed(context, TelaPrimeiroLogin.id);
     } else {
-      Navigator.pushNamed(context, TelaMensagens.id);
+      Navigator.pushNamed(context, TelaHome.id);
     }
     // Once signed in, return the UserCredential
     if (credential != null) {

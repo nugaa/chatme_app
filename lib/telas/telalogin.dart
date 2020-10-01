@@ -2,7 +2,7 @@ import 'package:chatme/customwidgets/alertcustom.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/customwidgets/textstylescustom.dart';
 import 'package:chatme/networking/google_service.dart';
-import 'package:chatme/networking/servicos_firebase.dart';
+import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/telas/telaregisto.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -87,12 +87,13 @@ class _TelaLoginState extends State<TelaLogin> {
                               ),
                             ),
                             onPressed: () async {
-                              if (email != null || password != null) {
+                              if (emailEditingText.text.isNotEmpty &&
+                                  passwordEditingText.text.isNotEmpty) {
                                 setState(() {
                                   showSpinner = true;
                                 });
 
-                                var passarFalso = await ServicosFirebase()
+                                var passarFalso = await ServicosFirebaseAuth()
                                     .loginEmailPassword(
                                         context, email, password, showSpinner);
 

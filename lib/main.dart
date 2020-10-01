@@ -1,4 +1,5 @@
 import 'package:chatme/telas/telalogin.dart';
+import 'package:chatme/telas/telahome.dart';
 import 'package:chatme/telas/telamensagens.dart';
 import 'package:chatme/telas/telaprimeirologin.dart';
 import 'package:chatme/telas/telaregisto.dart';
@@ -62,9 +63,10 @@ class _AppState extends State<App> {
       initialRoute: TelaLogin.id,
       routes: {
         TelaLogin.id: (context) => TelaLogin(),
-        TelaMensagens.id: (context) => TelaMensagens(),
+        TelaHome.id: (context) => TelaHome(),
         TelaRegisto.id: (context) => TelaRegisto(),
         TelaPrimeiroLogin.id: (context) => TelaPrimeiroLogin(),
+        TelaMensagens.id: (context) => TelaMensagens(),
       },
     );
   }
@@ -77,6 +79,7 @@ ThemeData _tema = ThemeData(
   fontFamily: 'Ubuntu-Regular',
   scaffoldBackgroundColor: corScaffold,
   cardColor: corUserMsg,
+  cursorColor: Colors.white,
   buttonTheme: ButtonThemeData(
     buttonColor: corBotao,
   ),
