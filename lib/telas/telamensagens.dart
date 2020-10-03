@@ -12,11 +12,20 @@ class TelaMensagens extends StatefulWidget {
 
 class _TelaMensagensState extends State<TelaMensagens> {
   Map dados = {};
+  String userEmail, utilizador;
+
+  emailRemetente() async {
+    utilizador = await ServicosFirebaseAuth().obterUtilizador();
+    setState(() {
+      userEmail = utilizador;
+    });
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    emailRemetente();
   }
 
   @override
@@ -39,7 +48,10 @@ class _TelaMensagensState extends State<TelaMensagens> {
               child: SingleChildScrollView(
                 reverse: true,
                 scrollDirection: Axis.vertical,
-                child: ServicosFirestoreDatabase().streamBuilder(context),
+                child: ServicosFirestoreDatabase().streamBuilder(
+                  contexto: context,
+                  utilizador: userEmail,
+                ),
               ),
             ),
             textfieldFlutuante(context),

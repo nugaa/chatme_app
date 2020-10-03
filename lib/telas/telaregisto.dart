@@ -104,6 +104,12 @@ class _TelaRegistoState extends State<TelaRegisto> {
                     _passverificaControl.clear();
                     _nomeControl.clear();
                     _emailControl.clear();
+
+                    if (mostrar == false) {
+                      setState(() {
+                        showSpinner = false;
+                      });
+                    }
                   } else {
                     showDialog(
                       context: context,

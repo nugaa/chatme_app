@@ -1,16 +1,10 @@
 import 'package:chatme/constantes.dart';
-import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
 
 class ServicosFirestoreDatabase {
   final _firestore = FirebaseFirestore.instance;
-  String nome;
-
-  emailRemetente() async {
-    nome = await ServicosFirebaseAuth().obterUtilizador();
-  }
 
   Future enviarMensagem(
       String enviadoPor, String mensagem, String email) async {
@@ -27,7 +21,7 @@ class ServicosFirestoreDatabase {
     }
   }
 
-  StreamBuilder streamBuilder(BuildContext contexto) {
+  StreamBuilder streamBuilder({BuildContext contexto, String utilizador}) {
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore.collection('mensagens').snapshots(),
       builder: (context, mensagem) {
@@ -38,8 +32,7 @@ class ServicosFirestoreDatabase {
             ),
           );
         }
-        emailRemetente();
-        final mensagens = mensagem.data.docs;
+        final mensagens = mensagem.data.docs.reversed;
         List<Widget> msgWidgets = [];
         for (var msg in mensagens) {
           final msgTexto = msg.data()['mensagem'];
@@ -47,7 +40,7 @@ class ServicosFirestoreDatabase {
           final emailUser = msg.data()['email'];
           Container msgWidget = salaChatCard(
             context: contexto,
-            enviadoPorMim: emailUser == nome ? true : false,
+            enviadoPorMim: emailUser == utilizador ? true : false,
             imagemUrl: null,
             textoMensagem: msgTexto,
             remetente: msgEnviadoPor,
