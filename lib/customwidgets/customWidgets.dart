@@ -320,6 +320,7 @@ Container salaChatCard(
     @required bool enviadoPorMim,
     @required String imagemUrl,
     @required String textoMensagem,
+    @required String horas,
     @required String remetente}) {
   return Container(
     padding: enviadoPorMim
@@ -390,7 +391,7 @@ Container salaChatCard(
             alignment:
                 enviadoPorMim ? Alignment.bottomRight : Alignment.bottomLeft,
             child: Text(
-              '$remetente 16:00',
+              enviadoPorMim ? horas : '$remetente $horas',
               style: textFieldStyle(
                 tamanho: 14,
                 cor: Colors.white24,
@@ -448,6 +449,8 @@ Padding textfieldFlutuante(BuildContext context) {
                 ),
                 onTap: () {
                   //TODO: aceder à galeria
+                  String agora = DateTime.now().toString();
+                  print(agora);
                 },
               ),
               SizedBox(

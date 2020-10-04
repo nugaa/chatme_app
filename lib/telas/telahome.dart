@@ -1,6 +1,7 @@
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/customwidgets/textstylescustom.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
+import 'package:chatme/networking/servicos_firestore_database.dart';
 import 'package:chatme/telas/telamensagens.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -137,6 +138,7 @@ class _TelaHomeState extends State<TelaHome> {
                   nome: nome,
                   ultimaMsg: msg,
                   horas: '10:20',
+                  //TODO: ultima hora
                 ),
               ),
             ),
