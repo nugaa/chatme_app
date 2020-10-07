@@ -152,6 +152,7 @@ Card mensagemCard(
         ),
         subtitle: Text(
           ultimaMsg,
+          maxLines: 1,
           style: textFieldStyle(
             tamanho: 14.0,
             fontWeight: FontWeight.normal,

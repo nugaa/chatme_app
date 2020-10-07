@@ -3,6 +3,7 @@ import 'package:chatme/customwidgets/textstylescustom.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/networking/servicos_firestore_database.dart';
 import 'package:chatme/telas/telamensagens.dart';
+import 'package:chatme/telas/telaprimeirologin.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,6 +18,7 @@ class TelaHome extends StatefulWidget {
 class _TelaHomeState extends State<TelaHome> {
   String nome = 'Nuga';
   String msg = 'última mensagem';
+  List<String> lista = [];
 
   List<Widget> listaUsers = [
     novoContacto,
@@ -33,11 +35,23 @@ class _TelaHomeState extends State<TelaHome> {
     contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
   ];
 
+  preencherListaDados() async {
+    List list = await ServicosFirestoreDatabase().obterDadosUltimaMensagem();
+    setState(() {
+      if (list != lista) {
+        lista = list;
+      } else {
+        print('Não há novos items na lista.');
+      }
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
-    super.initState();
+    preencherListaDados();
     ServicosFirebaseAuth().obterUtilizador();
+    super.initState();
   }
 
   @override
@@ -73,8 +87,9 @@ class _TelaHomeState extends State<TelaHome> {
                     cor: Colors.white,
                     icone: Icons.more_horiz,
                     tamanho: 35.0,
-                    onPress: () {
+                    onPress: () async {
                       //TODO: onPress MOSTRAR TODOS CONTACTOS NUMA LISTA
+                      Navigator.pushNamed(context, TelaPrimeiroLogin.id);
                     },
                   ),
                 ],
@@ -136,9 +151,8 @@ class _TelaHomeState extends State<TelaHome> {
                   context: context,
                   imagemPath: 'images/foto.jpg',
                   nome: nome,
-                  ultimaMsg: msg,
-                  horas: '10:20',
-                  //TODO: ultima hora
+                  ultimaMsg: lista[0],
+                  horas: lista[1],
                 ),
               ),
             ),

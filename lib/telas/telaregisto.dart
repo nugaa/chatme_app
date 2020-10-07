@@ -89,6 +89,7 @@ class _TelaRegistoState extends State<TelaRegisto> {
                 texto: 'Criar Conta',
                 onPress: () async {
                   //TODO: Falta aproveitar o Nome que está guardado no Utilizador
+                  // TODO: criar perfil de utilizador com esta informação
 
                   if (_passwordControl.text == _passverificaControl.text &&
                       _passwordControl.text.length >= 6) {

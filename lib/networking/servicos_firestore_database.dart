@@ -24,9 +24,20 @@ class ServicosFirestoreDatabase {
     });
   }
 
-  Future obterMensagens() async {
-    await for (var snapshot in _firestore.collection('mensagens').snapshots()) {
-      for (var mensagem in snapshot.docs) {}
+  Future<List<String>> obterDadosUltimaMensagem() async {
+    try {
+      QuerySnapshot query = await _firestore
+          .collection('mensagens')
+          .orderBy('diaHora', descending: true)
+          .limit(1)
+          .get();
+
+      String ultimaMsg = query.docs.last.get('mensagem');
+      String ultimaHora = query.docs.last.get('horas');
+
+      return [ultimaMsg, ultimaHora];
+    } on Exception catch (e) {
+      print('obterDadosUltimaMensagem deu um erro: $e');
     }
   }
 

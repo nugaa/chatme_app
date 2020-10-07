@@ -1,6 +1,7 @@
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/networking/servicos_firestore_database.dart';
+import 'package:chatme/telas/telahome.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -39,7 +40,10 @@ class _TelaMensagensState extends State<TelaMensagens> {
               iconePrefixo: Icons.arrow_back_ios,
               titulo: dados['nome'],
               iconeSufixo: FontAwesomeIcons.phoneAlt,
-              onTapp: () => Navigator.pop(context),
+              onTapp: () {
+                Navigator.popAndPushNamed(context, TelaHome.id)
+                    .then((value) => setState(() => {}));
+              },
             ),
             SizedBox(
               height: 2.0,
