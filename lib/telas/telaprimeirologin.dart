@@ -1,7 +1,9 @@
+import 'package:chatme/networking/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
 class TelaPrimeiroLogin extends StatefulWidget {
   static const String id = 'tela_primeiro_login';
@@ -52,8 +54,13 @@ class _TelaPrimeiroLoginState extends State<TelaPrimeiroLogin> {
                     FontAwesomeIcons.plusCircle,
                     color: Colors.white30,
                   ),
-                  onPressed: () {
+                  onPressed: () async {
+                    final ImagePicker _picker = ImagePicker();
+                    PickedFile _imagemSelecionada;
                     //TODO: adicionar imagem
+                    final imagem =
+                        await _picker.getImage(source: ImageSource.gallery);
+                    _imagemSelecionada = imagem;
                   },
                 ),
               ],
