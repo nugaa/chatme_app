@@ -1,4 +1,5 @@
 import 'package:chatme/customwidgets/textstylescustom.dart';
+import 'package:chatme/networking/firebase_storage.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/networking/servicos_firestore_database.dart';
 import 'package:chatme/utilizador.dart';
@@ -11,6 +12,7 @@ import '../constantes.dart';
 
 Container customAppbar(
     {@required String titulo,
+    String userEmail,
     IconData iconePrefixo,
     @required IconData iconeSufixo,
     @required Function onTapp,
@@ -33,10 +35,19 @@ Container customAppbar(
             SizedBox(
               width: 8.0,
             ),
-            CircleAvatar(
-              radius: 24.0,
-              //TODO: imagem muda consoante utilizador
-              backgroundImage: AssetImage('images/foto.jpg'),
+            FutureBuilder(
+              future: FirebaseStorageRepo().obterUserAvatar(user: userEmail),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done)
+                  return Container(
+                    child: snapshot.data,
+                  );
+                else if (snapshot.connectionState == ConnectionState.waiting)
+                  return Container(
+                    child: CircularProgressIndicator(),
+                  );
+                return Container();
+              },
             ),
           ],
         ),
@@ -342,7 +353,7 @@ Container salaChatCard(
                   : const EdgeInsets.only(right: 6.0),
               child: enviadoPorMim
                   ? _mostrarAvatar(null)
-                  : _mostrarAvatar('images/foto.jpg'),
+                  : _mostrarAvatar('images/foto.png'),
             ),
             Flexible(
               child: Container(

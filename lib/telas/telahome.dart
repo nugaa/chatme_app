@@ -19,20 +19,21 @@ class _TelaHomeState extends State<TelaHome> {
   String nome = 'Nuga';
   String msg = 'última mensagem';
   List<String> lista = [];
+  String _userEmail, _utilizador;
 
   List<Widget> listaUsers = [
     novoContacto,
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.jpg', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
+    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
   ];
 
   preencherListaDados() async {
@@ -46,11 +47,18 @@ class _TelaHomeState extends State<TelaHome> {
     });
   }
 
+  emailUser() async {
+    _utilizador = await ServicosFirebaseAuth().obterUtilizador();
+    setState(() {
+      _userEmail = _utilizador;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     preencherListaDados();
-    ServicosFirebaseAuth().obterUtilizador();
+    emailUser();
     super.initState();
   }
 
@@ -62,6 +70,7 @@ class _TelaHomeState extends State<TelaHome> {
         child: Column(
           children: <Widget>[
             customAppbar(
+              userEmail: _userEmail,
               titulo: 'Minhas Mensagens',
               iconeSufixo: FontAwesomeIcons.bars,
               onTap2: () => ServicosFirebaseAuth().logout(context),
@@ -89,7 +98,6 @@ class _TelaHomeState extends State<TelaHome> {
                     tamanho: 35.0,
                     onPress: () async {
                       //TODO: onPress MOSTRAR TODOS CONTACTOS NUMA LISTA
-                      Navigator.pushNamed(context, TelaPrimeiroLogin.id);
                     },
                   ),
                 ],
@@ -149,7 +157,7 @@ class _TelaHomeState extends State<TelaHome> {
                 },
                 child: mensagemCard(
                   context: context,
-                  imagemPath: 'images/foto.jpg',
+                  imagemPath: 'images/foto.png',
                   nome: nome,
                   ultimaMsg: lista[0],
                   horas: lista[1],
