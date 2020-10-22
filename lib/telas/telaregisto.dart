@@ -2,6 +2,7 @@ import 'package:chatme/comparar_regex.dart';
 import 'package:chatme/customwidgets/alertcustom.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
+import 'package:chatme/networking/servicos_firestore_database.dart';
 import 'package:chatme/telas/telalogin.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -24,13 +25,17 @@ class _TelaRegistoState extends State<TelaRegisto> {
   TextEditingController _passverificaControl = TextEditingController();
   Color cor;
   bool showSpinner = false;
+  bool passou = false;
 
-  void verificarEmail(String value) {
+  bool verificarEmail(String value) {
     if (compararRegex.validarEmail(email: value) == true) {
       utilizador.email = value;
       cor = Colors.white;
+      passou = true;
+      return passou;
     } else {
       cor = Colors.red;
+      return passou = false;
     }
   }
 
@@ -53,7 +58,7 @@ class _TelaRegistoState extends State<TelaRegisto> {
                 icone: Icons.person_outline,
                 textoHint: 'Nome',
                 onChange: (value) {
-                  utilizador.email = value;
+                  utilizador.nome = value;
                 },
               ),
               textFieldCustom(
@@ -88,38 +93,54 @@ class _TelaRegistoState extends State<TelaRegisto> {
               outlineButtonCustom(
                 texto: 'Criar Conta',
                 onPress: () async {
-                  //TODO: Falta aproveitar o Nome que está guardado no Utilizador
-                  // TODO: criar perfil de utilizador com esta informação
-
-                  if (_passwordControl.text == _passverificaControl.text &&
-                      _passwordControl.text.length >= 6) {
-                    setState(() {
-                      showSpinner = true;
-                    });
-
-                    var mostrar = await ServicosFirebaseAuth()
-                        .registarEmailPassword(context, utilizador.email,
-                            utilizador.password, showSpinner);
-
-                    _passwordControl.clear();
-                    _passverificaControl.clear();
-                    _nomeControl.clear();
-                    _emailControl.clear();
-
-                    if (mostrar == false) {
-                      setState(() {
-                        showSpinner = false;
-                      });
-                    }
-                  } else {
+                  if (_nomeControl.text == null ||
+                      _nomeControl.text.length < 3) {
                     showDialog(
                       context: context,
                       builder: (_) {
                         return alertaDialog(
                           titulo: 'Erro!',
-                          msgerro: _passwordControl.text.length < 6
-                              ? 'A password tem que ter mais de 6 caractéres.'
-                              : 'As passwords não coincidem.',
+                          msgerro: _nomeControl.text.length < 3
+                              ? 'Por favor, introduza um nome válido.'
+                              : 'Por favor, introduza um nome.',
+                          onPress: () {
+                            _nomeControl.clear();
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                      barrierDismissible: true,
+                    );
+                  } else if (passou == false) {
+                    showDialog(
+                      context: context,
+                      builder: (_) {
+                        return alertaDialog(
+                          titulo: 'Erro!',
+                          msgerro: 'Introduza um email válido.',
+                          onPress: () {
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                      barrierDismissible: true,
+                    );
+                  } else if (_passwordControl.text.isEmpty ||
+                      _passwordControl.text.length < 6 ||
+                      _passwordControl.text != _passverificaControl.text) {
+                    showDialog(
+                      context: context,
+                      builder: (_) {
+                        return alertaDialog(
+                          titulo: 'Erro!',
+                          msgerro: _passwordControl.text.isEmpty
+                              ? 'Introduza uma password.'
+                              : _passwordControl.text.length < 6
+                                  ? 'A password tem que ter mais de 6 caractéres.'
+                                  : _passwordControl.text !=
+                                          _passverificaControl.text
+                                      ? 'As passwords não coincidem.'
+                                      : _passwordControl.text,
                           onPress: () {
                             _passwordControl.clear();
                             _passverificaControl.clear();
@@ -129,7 +150,21 @@ class _TelaRegistoState extends State<TelaRegisto> {
                       },
                       barrierDismissible: true,
                     );
+                  } else {
+                    setState(() {
+                      showSpinner = true;
+                    });
+
+                    var mostrar = await ServicosFirebaseAuth()
+                        .registarEmailPassword(context, utilizador.email,
+                            utilizador.password, showSpinner);
+
+                    ServicosFirestoreDatabase().criarUtilizador(
+                        utilizador.nome, utilizador.email, context);
                   }
+                  setState(() {
+                    showSpinner = false;
+                  });
                 },
               ),
               Align(

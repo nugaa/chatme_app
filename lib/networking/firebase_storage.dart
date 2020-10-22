@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,10 @@ class FirebaseStorageRepo {
   final picker = ImagePicker();
 
   Future uploadUserAvatar(
-      BuildContext contexto, File imageFile, String userEmail) async {
+    BuildContext contexto,
+    File imageFile,
+    String userEmail,
+  ) async {
     if (userEmail != null) {
       try {
         StorageReference firebaseStorageRef = FirebaseStorage.instance
@@ -22,26 +26,92 @@ class FirebaseStorageRepo {
               (value) => print('Completo: $value'),
             );
       } on FirebaseException catch (e) {
-        print(e.code);
+        print('Erro em uploadUserAvatar(): ${e.code}');
       }
     }
   }
 
-  Future<Widget> obterUserAvatar({String user, double diametro}) async {
+  Future obterUserAvatar({String user, double diametro}) async {
     String m;
     CircleAvatar circleAvatar;
-    await _storage
-        .ref()
-        .child('uploads/$user/avatars/avatar')
-        .getDownloadURL()
-        .then((downloadUrl) {
-      m = downloadUrl.toString();
-    });
 
-    circleAvatar = CircleAvatar(
-      backgroundImage: NetworkImage(m),
-      radius: diametro,
-    );
-    return circleAvatar;
+    if (user != null) {
+      try {
+        await _storage
+            .ref()
+            .child('uploads/$user/avatars/avatar')
+            .getDownloadURL()
+            .then((downloadUrl) {
+          m = downloadUrl.toString();
+        });
+
+        circleAvatar = CircleAvatar(
+          backgroundImage: NetworkImage(m),
+          radius: diametro == null ? diametro = 28.0 : diametro,
+        );
+        return circleAvatar;
+      } on FirebaseException catch (e) {
+        print('Erro em obterUserAvatar(): ${e.code}');
+      }
+    } else {
+      return Container();
+    }
+  }
+
+  Future<ListView> todosAvatares({double diametro, String email}) async {
+    String m;
+    final _firestore = FirebaseFirestore.instance;
+    List listaEmails = [];
+    List listaUsername = [];
+    List<Widget> listaAvatars = [];
+    try {
+      final documento =
+          await _firestore.collection('Utilizador').get().then((snapshot) {
+        snapshot.docs.forEach((doc) {
+          listaEmails.add(doc.get('email'));
+          listaEmails.removeWhere((item) => item == email);
+        });
+      });
+
+      final docUsername = _firestore
+        ..collection('Utilizador').get().then((snapshot) {
+          snapshot.docs.forEach((doc) {
+            doc.id == email ? null : listaUsername.add(doc.get('username'));
+          });
+        });
+
+      for (int i = 0; i < listaEmails.length; i++) {
+        await _storage
+            .ref()
+            .child('uploads/${listaEmails[i]}/avatars/avatar')
+            .getDownloadURL()
+            .then((downloadUrl) {
+          m = downloadUrl.toString();
+        });
+        listaAvatars.add(
+          CircleAvatar(
+            backgroundImage: NetworkImage(m),
+            radius: diametro == null ? diametro = 28.0 : diametro,
+          ),
+        );
+      }
+      return ListView.builder(
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+          itemCount: listaAvatars.length,
+          itemBuilder: (BuildContext _, int index) {
+            return Padding(
+                padding: const EdgeInsets.only(right: 20.0),
+                child: Row(
+                  children: <Widget>[
+                    contactoAvatar(
+                        avatar: listaAvatars[index],
+                        nome: listaUsername[index]),
+                  ],
+                ));
+          });
+    } on FirebaseException catch (e) {
+      print('Erro ao obter avatares para preencher lista: $e}');
+    }
   }
 }

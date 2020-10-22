@@ -3,6 +3,7 @@ import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/customwidgets/textstylescustom.dart';
 import 'package:chatme/networking/google_service.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
+import 'package:chatme/networking/servicos_firestore_database.dart';
 import 'package:chatme/telas/telaregisto.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -98,7 +99,7 @@ class _TelaLoginState extends State<TelaLogin> {
                                         context, email, password, showSpinner);
 
                                 setState(() {
-                                  showSpinner = passarFalso;
+                                  showSpinner = false;
                                 });
 
                                 emailEditingText.clear();
@@ -147,11 +148,9 @@ class _TelaLoginState extends State<TelaLogin> {
                             });
                             signInWithGoogle(context);
 
-                            if (showSpinner == true) {
-                              setState(() {
-                                showSpinner = false;
-                              });
-                            }
+                            setState(() {
+                              showSpinner = false;
+                            });
                           },
                         ),
                         SizedBox(

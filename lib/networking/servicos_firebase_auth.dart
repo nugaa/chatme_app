@@ -1,3 +1,4 @@
+import 'package:chatme/customwidgets/alertcustom.dart';
 import 'package:chatme/telas/telahome.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +16,41 @@ class ServicosFirebaseAuth {
       if (mostrar == true) {
         return false;
       }
-    } catch (e) {
-      print(e);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        return showDialog(
+          context: context,
+          builder: (_) {
+            return alertaDialog(
+              titulo: 'Erro!',
+              msgerro: 'Este email já está ocupado.',
+              onPress: () {
+                Navigator.pop(context);
+              },
+            );
+          },
+          barrierDismissible: true,
+        );
+      } else if (e.code == 'weak-password') {
+        return showDialog(
+          context: context,
+          builder: (_) {
+            return alertaDialog(
+              titulo: 'Erro!',
+              msgerro: 'Password fraca, introduza uma password mais segura.',
+              onPress: () {
+                Navigator.pop(context);
+              },
+            );
+          },
+          barrierDismissible: true,
+        );
+      }
     }
   }
 
+  // email-already-in-use
+  //
   Future loginEmailPassword(
       BuildContext context, String email, String password, bool mostrar) async {
     try {
@@ -35,9 +66,33 @@ class ServicosFirebaseAuth {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         //TODO: se der erro mostrar widget com mensagem de erro
-        print('Não existe nenhum utilizador com este email.');
+        return showDialog(
+          context: context,
+          builder: (_) {
+            return alertaDialog(
+              titulo: 'Erro!',
+              msgerro: 'Não existe nenhum utilizador com este email.',
+              onPress: () {
+                Navigator.pop(context);
+              },
+            );
+          },
+          barrierDismissible: true,
+        );
       } else if (e.code == 'wrong-password') {
-        print('A password está errada para este email.');
+        return showDialog(
+          context: context,
+          builder: (_) {
+            return alertaDialog(
+              titulo: 'Erro!',
+              msgerro: 'A password está errada para este email.',
+              onPress: () {
+                Navigator.pop(context);
+              },
+            );
+          },
+          barrierDismissible: true,
+        );
       }
     }
   }

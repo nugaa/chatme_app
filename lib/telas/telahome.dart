@@ -1,9 +1,9 @@
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/customwidgets/textstylescustom.dart';
+import 'package:chatme/networking/firebase_storage.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/networking/servicos_firestore_database.dart';
 import 'package:chatme/telas/telamensagens.dart';
-import 'package:chatme/telas/telaprimeirologin.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -16,48 +16,44 @@ class TelaHome extends StatefulWidget {
 }
 
 class _TelaHomeState extends State<TelaHome> {
-  String nome = 'Nuga';
-  String msg = 'última mensagem';
+  //TODO: Na mensagemCard reparar Imagem e Nome apresentado.
+  String nome = 'Teste';
   List<String> lista = [];
   String _userEmail, _utilizador;
 
-  List<Widget> listaUsers = [
-    novoContacto,
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-    contactoAvatar(imagempath: 'images/foto.png', nome: 'Nuga'),
-  ];
-
   preencherListaDados() async {
-    List list = await ServicosFirestoreDatabase().obterDadosUltimaMensagem();
-    setState(() {
-      if (list != lista) {
-        lista = list;
-      } else {
-        print('Não há novos items na lista.');
+    try {
+      List list = await ServicosFirestoreDatabase().obterDadosUltimaMensagem();
+
+      if (list.isNotEmpty) {
+        if (list != lista) {
+          setState(() {
+            lista = list;
+          });
+        } else {
+          print('Não há novos items na lista.');
+        }
       }
-    });
+    } catch (e) {
+      print('Erro em preencherListaDados(): $e');
+    }
   }
 
   emailUser() async {
-    _utilizador = await ServicosFirebaseAuth().obterUtilizador();
-    setState(() {
-      _userEmail = _utilizador;
-    });
+    try {
+      _utilizador = await ServicosFirebaseAuth().obterUtilizador();
+      setState(() {
+        _userEmail = _utilizador;
+      });
+      preencherListaDados();
+    } catch (e) {
+      print('Deu erro no emailUser: $e');
+    }
   }
 
   @override
   void initState() {
     // TODO: implement initState
-    preencherListaDados();
     emailUser();
     super.initState();
   }
@@ -98,6 +94,7 @@ class _TelaHomeState extends State<TelaHome> {
                     tamanho: 35.0,
                     onPress: () async {
                       //TODO: onPress MOSTRAR TODOS CONTACTOS NUMA LISTA
+                      ServicosFirestoreDatabase().criarSala();
                     },
                   ),
                 ],
@@ -110,15 +107,37 @@ class _TelaHomeState extends State<TelaHome> {
                   Flexible(
                     child: Container(
                       height: 100.0,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: listaUsers.length,
-                        itemBuilder: (BuildContext _, int index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 20.0),
-                            child: listaUsers[index],
-                          );
+                      child: FutureBuilder<Widget>(
+                        future: FirebaseStorageRepo()
+                            .todosAvatares(email: _userEmail),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.done)
+                            return ListView(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              //TODO: Retornar uma Lista horizontal com Imagem e Nome
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 20.0),
+                                  child: Row(
+                                    children: <Widget>[
+                                      novoContacto,
+                                      snapshot.data,
+                                    ],
+                                  ),
+                                )
+                              ],
+                            );
+                          else if (snapshot.connectionState ==
+                              ConnectionState.waiting)
+                            return Center(
+                              child: Container(
+                                height: 28.0,
+                                width: 28.0,
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          return Container();
                         },
                       ),
                     ),
@@ -147,22 +166,33 @@ class _TelaHomeState extends State<TelaHome> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 20.0),
-              child: InkWell(
-                splashColor: Colors.transparent,
-                onTap: () async {
-                  await Navigator.pushNamed(context, TelaMensagens.id,
-                      arguments: {
-                        'nome': nome,
-                      });
-                },
-                child: mensagemCard(
-                  context: context,
-                  imagemPath: 'images/foto.png',
-                  nome: nome,
-                  ultimaMsg: lista[0],
-                  horas: lista[1],
-                ),
-              ),
+              child: lista.isNotEmpty
+                  ? InkWell(
+                      splashColor: Colors.transparent,
+                      onTap: () async {
+                        await Navigator.pushReplacementNamed(
+                            context, TelaMensagens.id,
+                            arguments: {
+                              'nome': nome,
+                            });
+                      },
+                      child: mensagemCard(
+                        context: context,
+                        imagemPath: 'images/foto.jpg',
+                        nome: nome,
+                        ultimaMsg: lista[0],
+                        horas: lista[1],
+                      ))
+                  : Container(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'Não existem mensagens para mostrar.',
+                        style: textFieldStyle(
+                          tamanho: 18,
+                          cor: Colors.white12,
+                        ),
+                      ),
+                    ),
             ),
           ],
         ),

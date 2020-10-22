@@ -1,8 +1,8 @@
+import 'dart:io';
 import 'package:chatme/customwidgets/textstylescustom.dart';
 import 'package:chatme/networking/firebase_storage.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/networking/servicos_firestore_database.dart';
-import 'package:chatme/utilizador.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -36,7 +36,8 @@ Container customAppbar(
               width: 8.0,
             ),
             FutureBuilder(
-              future: FirebaseStorageRepo().obterUserAvatar(user: userEmail),
+              future: FirebaseStorageRepo()
+                  .obterUserAvatar(user: userEmail, diametro: 24.0),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done)
                   return Container(
@@ -82,8 +83,7 @@ IconButton customIconButton(
   );
 }
 
-Column contactoAvatar(
-    {@required String imagempath, String nome, double diametro}) {
+Column contactoAvatar({@required Widget avatar, String nome, double diametro}) {
   return Column(
     children: <Widget>[
       InkWell(
@@ -93,8 +93,8 @@ Column contactoAvatar(
         },
         child: CircleAvatar(
           radius: diametro == null ? diametro = 28.0 : diametro,
-          //TODO: imagem muda consoante utilizador
-          backgroundImage: AssetImage(imagempath),
+          child: avatar,
+          //TODO: imagem muda consoante utilizador,
         ),
       ),
       SizedBox(
@@ -210,6 +210,7 @@ Column novoContacto = Column(
 );
 
 Padding textFieldCustom({
+  Key chave,
   bool esconderTexto,
   IconData icone,
   String textoHint,
@@ -240,6 +241,7 @@ Padding textFieldCustom({
           horizontal: 35.0,
         ),
         child: TextField(
+          key: chave,
           controller: control,
           keyboardType: textInput == null ? TextInputType.text : textInput,
           cursorColor: Colors.white,
@@ -330,7 +332,6 @@ Row separador = Row(
 Container salaChatCard(
     {@required BuildContext context,
     @required bool enviadoPorMim,
-    @required String imagemUrl,
     @required String textoMensagem,
     @required String horas,
     @required String remetente}) {
@@ -347,14 +348,6 @@ Container salaChatCard(
               enviadoPorMim ? MainAxisAlignment.end : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
-            Padding(
-              padding: enviadoPorMim
-                  ? const EdgeInsets.only(left: 6.0)
-                  : const EdgeInsets.only(right: 6.0),
-              child: enviadoPorMim
-                  ? _mostrarAvatar(null)
-                  : _mostrarAvatar('images/foto.png'),
-            ),
             Flexible(
               child: Container(
                 decoration: ShapeDecoration(
@@ -396,7 +389,7 @@ Container salaChatCard(
                   top: 2.0,
                 )
               : const EdgeInsets.only(
-                  left: 50.0,
+                  left: 12.0,
                   top: 2.0,
                 ),
           child: Align(
@@ -417,17 +410,15 @@ Container salaChatCard(
   );
 }
 
-_mostrarAvatar(String temImagem) {
-  if (temImagem != null) {
-    return CircleAvatar(
-      radius: 20,
-      //TODO: imagem muda consoante utilizador
-      backgroundImage: AssetImage(temImagem),
-    );
+mostrarAvatar(String userAvatar) {
+  if (userAvatar != null) {
+    final avatar =
+        FirebaseStorageRepo().obterUserAvatar(user: userAvatar, diametro: 20.0);
+    return avatar;
   }
 }
 
-Padding textfieldFlutuante(BuildContext context) {
+Padding textfieldFlutuante({BuildContext context, String useremail}) {
   TextEditingController mensagem = TextEditingController();
   return Padding(
     padding:
@@ -459,10 +450,8 @@ Padding textfieldFlutuante(BuildContext context) {
                   size: 28.0,
                   color: Colors.white,
                 ),
-                onTap: () {
+                onTap: () async {
                   //TODO: aceder à galeria
-                  String agora = DateTime.now().toString();
-                  print(agora);
                 },
               ),
               SizedBox(
@@ -475,6 +464,8 @@ Padding textfieldFlutuante(BuildContext context) {
                   color: Colors.white,
                 ),
                 onPressed: () async {
+                  String _passarUserName = await ServicosFirestoreDatabase()
+                      .getMeuUsername(useremail);
                   String textoMensagem = mensagem.text;
                   if (textoMensagem.length < 1 || textoMensagem.isEmpty) {
                     Scaffold.of(context).showSnackBar(
@@ -484,7 +475,7 @@ Padding textfieldFlutuante(BuildContext context) {
                     String email =
                         await ServicosFirebaseAuth().obterUtilizador();
                     ServicosFirestoreDatabase()
-                        .enviarMensagem('Ricardo', textoMensagem, email);
+                        .enviarMensagem(_passarUserName, textoMensagem, email);
                     mensagem.clear();
                   }
                 },

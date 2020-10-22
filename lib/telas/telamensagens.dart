@@ -37,11 +37,12 @@ class _TelaMensagensState extends State<TelaMensagens> {
         child: Column(
           children: <Widget>[
             customAppbar(
+              userEmail: _userEmail,
               iconePrefixo: Icons.arrow_back_ios,
               titulo: dados['nome'],
               iconeSufixo: FontAwesomeIcons.phoneAlt,
               onTapp: () {
-                Navigator.popAndPushNamed(context, TelaHome.id)
+                Navigator.pushReplacementNamed(context, TelaHome.id)
                     .then((value) => setState(() => {}));
               },
             ),
@@ -58,7 +59,7 @@ class _TelaMensagensState extends State<TelaMensagens> {
                 ),
               ),
             ),
-            textfieldFlutuante(context),
+            textfieldFlutuante(context: context, useremail: _userEmail),
           ],
         ),
       ),

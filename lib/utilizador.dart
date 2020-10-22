@@ -1,8 +1,15 @@
 class Utilizador {
   String _nome;
+  String _username;
   String _email;
   String _password;
   String _passverifica;
+
+  String get username => _username;
+
+  set username(String value) {
+    _username = value;
+  }
 
   String get passverifica => _passverifica;
 
