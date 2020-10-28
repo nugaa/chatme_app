@@ -65,7 +65,6 @@ class ServicosFirebaseAuth {
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        //TODO: se der erro mostrar widget com mensagem de erro
         return showDialog(
           context: context,
           builder: (_) {

@@ -14,19 +14,27 @@ class TelaMensagens extends StatefulWidget {
 class _TelaMensagensState extends State<TelaMensagens> {
   Map dados = {};
   String _userEmail, _utilizador;
+  String _salaNome, _meuUsername;
+
+  nomeDaSala() async {
+    _meuUsername = await ServicosFirestoreDatabase().getMeuUsername(_userEmail);
+    _salaNome = await ServicosFirestoreDatabase()
+        .verificarSalaExiste(enviadoPor: _meuUsername, destino: dados['nome']);
+    setState(() {});
+  }
 
   emailRemetente() async {
     _utilizador = await ServicosFirebaseAuth().obterUtilizador();
     setState(() {
       _userEmail = _utilizador;
     });
+    await nomeDaSala();
   }
 
   @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
     emailRemetente();
+    super.initState();
   }
 
   @override
@@ -37,13 +45,17 @@ class _TelaMensagensState extends State<TelaMensagens> {
         child: Column(
           children: <Widget>[
             customAppbar(
+              imagemAvatar: dados['avatar'],
               userEmail: _userEmail,
               iconePrefixo: Icons.arrow_back_ios,
               titulo: dados['nome'],
               iconeSufixo: FontAwesomeIcons.phoneAlt,
               onTapp: () {
-                Navigator.pushReplacementNamed(context, TelaHome.id)
-                    .then((value) => setState(() => {}));
+                Navigator.pushReplacementNamed(context, TelaHome.id);
+                //     .then((value) {
+                //   setState(() {
+                //   });
+                // });
               },
             ),
             SizedBox(
@@ -56,10 +68,15 @@ class _TelaMensagensState extends State<TelaMensagens> {
                 child: ServicosFirestoreDatabase().streamBuilder(
                   contexto: context,
                   utilizador: _userEmail,
+                  nomeSala: _salaNome,
                 ),
               ),
             ),
-            textfieldFlutuante(context: context, useremail: _userEmail),
+            textfieldFlutuante(
+              context: context,
+              useremail: _userEmail,
+              destinatario: dados['nome'],
+            ),
           ],
         ),
       ),

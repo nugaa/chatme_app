@@ -58,7 +58,11 @@ class FirebaseStorageRepo {
     }
   }
 
-  Future<ListView> todosAvatares({double diametro, String email}) async {
+  Future<ListView> todosAvatares(
+      {@required BuildContext ctx,
+      double diametro,
+      String email,
+      String mUsername}) async {
     String m;
     final _firestore = FirebaseFirestore.instance;
     List listaEmails = [];
@@ -105,8 +109,11 @@ class FirebaseStorageRepo {
                 child: Row(
                   children: <Widget>[
                     contactoAvatar(
-                        avatar: listaAvatars[index],
-                        nome: listaUsername[index]),
+                      contexto: ctx,
+                      avatar: listaAvatars[index],
+                      nomeDestino: listaUsername[index],
+                      meuUsername: mUsername,
+                    ),
                   ],
                 ));
           });

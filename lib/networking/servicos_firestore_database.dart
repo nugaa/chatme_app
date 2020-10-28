@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chatme/constantes.dart';
 import 'package:chatme/customwidgets/alertcustom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -67,7 +69,6 @@ class ServicosFirestoreDatabase {
         listaDocs.add(doc.id);
       });
     });
-    //TODO: verificar se username existe
     if (listaDocs.contains(email)) {
       return showDialog(
         context: contexto,
@@ -91,27 +92,85 @@ class ServicosFirestoreDatabase {
     }
   }
 
-  Future enviarMensagem(String enviadoPor, String mensagem, String email) {
+  Future<List> salaMensagensId() async {
+    String a;
+    List _lista = []; //lista o id de todos os documentos das msgs entre users
+
+    final QuerySnapshot query = await _firestore.collection('Mensagens').get();
+
+    query.docs.forEach((doc) {
+      if (doc.id != null) {
+        a = doc.id;
+      } else {
+        print('Não tem mensagens.');
+      }
+      _lista.add(a);
+    });
+    return _lista;
+  }
+
+  Future<String> verificarSalaExiste(
+      {String enviadoPor, String destino}) async {
+    List _listaSalas = [];
+    String _urlMsg;
+    _listaSalas = await salaMensagensId();
+    if (_listaSalas != null) {
+      if (_listaSalas.contains('$enviadoPor-$destino')) {
+        _urlMsg = '$enviadoPor-$destino';
+      } else if (_listaSalas.contains('$destino-$enviadoPor')) {
+        _urlMsg = '$destino-$enviadoPor';
+      } else {
+        _urlMsg = '$enviadoPor-$destino';
+      }
+    } else {
+      print('Lista de salas vazia em obterSalas()');
+    }
+    return _urlMsg;
+  }
+
+  Future criarSalaChat(String mUser, String destino) async {
+    String _salaNome;
+    _salaNome = await verificarSalaExiste(enviadoPor: mUser, destino: destino);
+
+    _firestore
+        .collection('Mensagens')
+        .doc(_salaNome)
+        .set({'obj': 'sala de chat'});
+  }
+
+  Future enviarMensagem(
+      String enviadoPor, String mensagem, String email, String destino) async {
     DateTime agora = DateTime.now();
     final DateFormat formatter = DateFormat('dd-MM-yyyy');
     final String diaFormatado = formatter.format(agora);
     final DateFormat format = DateFormat.Hm();
     final String horaFormatada = format.format(agora);
-    //PASSAR O NOME DA LISTA PARA AQUI!!!
-    _firestore.collection('Mensagens').doc('$enviadoPor''_$').add({
-      'enviadoPor': enviadoPor,
-      'mensagem': mensagem,
-      'email': email,
-      'criadoEm': diaFormatado,
-      'horas': horaFormatada,
-      'diaHora': agora.toString(),
-    });
+    String _nomeSala;
+    _nomeSala =
+        await verificarSalaExiste(enviadoPor: enviadoPor, destino: destino);
+
+    if (_nomeSala != null) {
+      _firestore
+          .collection('Mensagens')
+          .doc(_nomeSala)
+          .collection('Conversa')
+          .add({
+        'enviadoPor': enviadoPor,
+        'mensagem': mensagem,
+        'email': email,
+        'criadoEm': diaFormatado,
+        'horas': horaFormatada,
+        'diaHora': agora.toString(),
+      });
+    }
   }
 
-  Future<List<String>> obterDadosUltimaMensagem() async {
+  Future<List<String>> obterDadosUltimaMensagem(String nomeSala) async {
     try {
       QuerySnapshot query = await _firestore
           .collection('Mensagens')
+          .doc(nomeSala)
+          .collection('Conversa')
           .orderBy('diaHora', descending: true)
           .limit(1)
           .get();
@@ -132,21 +191,27 @@ class ServicosFirestoreDatabase {
     }
   }
 
-  StreamBuilder streamBuilder({BuildContext contexto, String utilizador}) {
+  StreamBuilder streamBuilder({
+    BuildContext contexto,
+    String nomeSala,
+    String utilizador,
+  }) {
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore
           .collection('Mensagens')
+          .doc(nomeSala)
+          .collection('Conversa')
           .orderBy('diaHora', descending: true)
           .snapshots(),
-      builder: (context, mensagem) {
-        if (!mensagem.hasData) {
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
           return Center(
             child: CircularProgressIndicator(
               backgroundColor: corBotao,
             ),
           );
         }
-        final mensagens = mensagem.data.docs.reversed;
+        final mensagens = snapshot.data.docs.reversed;
         List<Widget> msgWidgets = [];
         for (var msg in mensagens) {
           final msgTexto = msg.data()['mensagem'];

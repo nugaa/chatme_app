@@ -20,10 +20,16 @@ class _TelaHomeState extends State<TelaHome> {
   String nome = 'Teste';
   List<String> lista = [];
   String _userEmail, _utilizador;
+  String username;
+
+  obterMeuUsername(String mail) async {
+    username = await ServicosFirestoreDatabase().getMeuUsername(mail);
+  }
 
   preencherListaDados() async {
     try {
-      List list = await ServicosFirestoreDatabase().obterDadosUltimaMensagem();
+      List list = await ServicosFirestoreDatabase()
+          .obterDadosUltimaMensagem('bakugou-wantek');
 
       if (list.isNotEmpty) {
         if (list != lista) {
@@ -45,7 +51,8 @@ class _TelaHomeState extends State<TelaHome> {
       setState(() {
         _userEmail = _utilizador;
       });
-      preencherListaDados();
+      await obterMeuUsername(_userEmail);
+      await preencherListaDados();
     } catch (e) {
       print('Deu erro no emailUser: $e');
     }
@@ -94,7 +101,6 @@ class _TelaHomeState extends State<TelaHome> {
                     tamanho: 35.0,
                     onPress: () async {
                       //TODO: onPress MOSTRAR TODOS CONTACTOS NUMA LISTA
-                      ServicosFirestoreDatabase().criarSala();
                     },
                   ),
                 ],
@@ -108,14 +114,15 @@ class _TelaHomeState extends State<TelaHome> {
                     child: Container(
                       height: 100.0,
                       child: FutureBuilder<Widget>(
-                        future: FirebaseStorageRepo()
-                            .todosAvatares(email: _userEmail),
+                        future: FirebaseStorageRepo().todosAvatares(
+                            ctx: context,
+                            email: _userEmail,
+                            mUsername: username),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.done)
                             return ListView(
                               shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
-                              //TODO: Retornar uma Lista horizontal com Imagem e Nome
                               children: <Widget>[
                                 Padding(
                                   padding: const EdgeInsets.only(right: 20.0),
@@ -166,6 +173,7 @@ class _TelaHomeState extends State<TelaHome> {
             ),
             Padding(
               padding: const EdgeInsets.only(left: 20.0),
+              //TODO: criar uma lista de widgets se EXISTIR COLEÇÃO Conversa
               child: lista.isNotEmpty
                   ? InkWell(
                       splashColor: Colors.transparent,

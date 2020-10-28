@@ -3,6 +3,7 @@ import 'package:chatme/customwidgets/textstylescustom.dart';
 import 'package:chatme/networking/firebase_storage.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/networking/servicos_firestore_database.dart';
+import 'package:chatme/telas/telamensagens.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ import '../constantes.dart';
 Container customAppbar(
     {@required String titulo,
     String userEmail,
+    Widget imagemAvatar,
     IconData iconePrefixo,
     @required IconData iconeSufixo,
     @required Function onTapp,
@@ -32,24 +34,24 @@ Container customAppbar(
                 color: Colors.white,
               ),
             ),
-            SizedBox(
-              width: 8.0,
-            ),
-            FutureBuilder(
-              future: FirebaseStorageRepo()
-                  .obterUserAvatar(user: userEmail, diametro: 24.0),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done)
-                  return Container(
-                    child: snapshot.data,
-                  );
-                else if (snapshot.connectionState == ConnectionState.waiting)
-                  return Container(
-                    child: CircularProgressIndicator(),
-                  );
-                return Container();
-              },
-            ),
+            imagemAvatar == null
+                ? FutureBuilder(
+                    future: FirebaseStorageRepo()
+                        .obterUserAvatar(user: userEmail, diametro: 28.0),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done)
+                        return Container(
+                          child: snapshot.data,
+                        );
+                      else if (snapshot.connectionState ==
+                          ConnectionState.waiting)
+                        return Container(
+                          child: CircularProgressIndicator(),
+                        );
+                      return Container();
+                    },
+                  )
+                : imagemAvatar,
           ],
         ),
         Text(
@@ -83,25 +85,31 @@ IconButton customIconButton(
   );
 }
 
-Column contactoAvatar({@required Widget avatar, String nome, double diametro}) {
+Column contactoAvatar(
+    {@required BuildContext contexto,
+    @required Widget avatar,
+    String nomeDestino,
+    String meuUsername,
+    double diametro}) {
   return Column(
     children: <Widget>[
       InkWell(
         splashColor: Colors.transparent,
         onTap: () {
-          //TODO: abrir sala de chat
+          Navigator.pushReplacementNamed(contexto, TelaMensagens.id,
+              arguments: {'nome': nomeDestino, 'avatar': avatar});
+          ServicosFirestoreDatabase().criarSalaChat(meuUsername, nomeDestino);
         },
         child: CircleAvatar(
           radius: diametro == null ? diametro = 28.0 : diametro,
           child: avatar,
-          //TODO: imagem muda consoante utilizador,
         ),
       ),
       SizedBox(
         height: 5.0,
       ),
       Text(
-        nome == null ? nome = '' : nome,
+        nomeDestino == null ? nomeDestino = '' : nomeDestino,
         style: textFieldStyle(
           tamanho: 12.0,
           cor: Colors.white,
@@ -418,7 +426,8 @@ mostrarAvatar(String userAvatar) {
   }
 }
 
-Padding textfieldFlutuante({BuildContext context, String useremail}) {
+Padding textfieldFlutuante(
+    {BuildContext context, String useremail, String destinatario}) {
   TextEditingController mensagem = TextEditingController();
   return Padding(
     padding:
@@ -471,11 +480,10 @@ Padding textfieldFlutuante({BuildContext context, String useremail}) {
                     Scaffold.of(context).showSnackBar(
                         snackBarAviso('Não envie mensagens em branco.'));
                   } else {
-                    //TODO: obter nome do utilizador através do perfil no Firebase
                     String email =
                         await ServicosFirebaseAuth().obterUtilizador();
-                    ServicosFirestoreDatabase()
-                        .enviarMensagem(_passarUserName, textoMensagem, email);
+                    ServicosFirestoreDatabase().enviarMensagem(
+                        _passarUserName, textoMensagem, email, destinatario);
                     mensagem.clear();
                   }
                 },
