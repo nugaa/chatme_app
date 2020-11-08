@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:chatme/customwidgets/alertcustom.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/customwidgets/textstylescustom.dart';
-import 'package:chatme/networking/firebase_storage.dart';
+import 'package:chatme/networking/firebase_storage_repo.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/networking/servicos_firestore_database.dart';
 import 'package:chatme/telas/telahome.dart';

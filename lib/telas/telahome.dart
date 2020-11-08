@@ -1,9 +1,8 @@
 import 'package:chatme/customwidgets/customWidgets.dart';
 import 'package:chatme/customwidgets/textstylescustom.dart';
-import 'package:chatme/networking/firebase_storage.dart';
+import 'package:chatme/networking/firebase_storage_repo.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/networking/servicos_firestore_database.dart';
-import 'package:chatme/telas/telamensagens.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,8 +21,8 @@ class _TelaHomeState extends State<TelaHome> {
   String _userEmail, _utilizador;
   String username;
 
-  obterMeuUsername(String mail) async {
-    username = await ServicosFirestoreDatabase().getMeuUsername(mail);
+  obterMeuUsername(String email) async {
+    username = await ServicosFirestoreDatabase().getMeuUsername(email);
   }
 
   preencherListaDados() async {
@@ -171,36 +170,42 @@ class _TelaHomeState extends State<TelaHome> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0),
-              //TODO: criar uma lista de widgets se EXISTIR COLEÇÃO Conversa
-              child: lista.isNotEmpty
-                  ? InkWell(
-                      splashColor: Colors.transparent,
-                      onTap: () async {
-                        await Navigator.pushReplacementNamed(
-                            context, TelaMensagens.id,
-                            arguments: {
-                              'nome': nome,
-                            });
-                      },
-                      child: mensagemCard(
-                        context: context,
-                        imagemPath: 'images/foto.jpg',
-                        nome: nome,
-                        ultimaMsg: lista[0],
-                        horas: lista[1],
-                      ))
-                  : Container(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'Não existem mensagens para mostrar.',
-                        style: textFieldStyle(
-                          tamanho: 18,
-                          cor: Colors.white12,
-                        ),
-                      ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 20.0),
+                //TODO: criar uma lista de widgets se EXISTIR COLEÇÃO Conversa
+                child: FutureBuilder(
+                    future: ServicosFirestoreDatabase()
+                        .listarSalasMensagensUtilizador(
+                      contexto: context,
+                      username: username,
+                      listaDeDados: lista,
                     ),
+                    builder: (ctx, sala) {
+                      if (sala.connectionState == ConnectionState.done) {
+                        return sala.data;
+                        // sala.hasData
+                        //   ? sala.data
+                        //   : Text(
+                        //       'Não existem mensagens...',
+                        //       style: textFieldStyle(
+                        //           tamanho: 18, cor: Colors.white30),
+                        //     );
+                      } else if (sala.connectionState ==
+                          ConnectionState.waiting)
+                        return Center(
+                          child: Container(
+                            height: 28.0,
+                            width: 28.0,
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      return Container();
+                    }),
+              ),
+            ),
+            SizedBox(
+              height: 14.0,
             ),
           ],
         ),
@@ -244,3 +249,11 @@ Widget _barraPesquisa = Padding(
     ),
   ),
 );
+
+// mensagemCard(
+// context: context,
+// imagemPath: 'images/foto.jpg',
+// nome: nome,
+// ultimaMsg: lista[0],
+// horas: lista[1],
+// )

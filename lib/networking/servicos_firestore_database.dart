@@ -1,7 +1,7 @@
 import 'dart:async';
-
 import 'package:chatme/constantes.dart';
 import 'package:chatme/customwidgets/alertcustom.dart';
+import 'package:chatme/networking/firebase_storage_repo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
@@ -9,6 +9,103 @@ import 'package:intl/intl.dart';
 
 class ServicosFirestoreDatabase {
   final _firestore = FirebaseFirestore.instance;
+
+  Future obterUltimaMsgHora({
+    List salas,
+    String usernome,
+  }) async {
+    List listar = List();
+    List listaDeDados = List();
+    List listaFinal = List();
+
+    for (var nomeSala in salas) {
+      listar.add(nomeSala);
+
+      if (nomeSala.toString().contains(usernome)) {
+        listaDeDados = await obterDadosUltimaMensagem(nomeSala);
+
+        for (int i = 0; i < listaDeDados.length; i++) {
+          listaFinal.add(listaDeDados[i]);
+        }
+      }
+    }
+    return listaFinal;
+  }
+
+  Future<Widget> listarSalasMensagensUtilizador({
+    BuildContext contexto,
+    String username,
+    List listaDeDados,
+  }) async {
+    String nomeDaSala;
+    String idSala;
+    List listaDeSalas = [];
+    List listaDeNomes = [];
+    List ultimaMsg = [];
+    List ultimaHora = [];
+
+    try {
+      listaDeSalas = await salaMensagensId();
+
+      if (listaDeSalas != null) {
+        listaDeSalas.forEach(
+          (item) async {
+            if (item.contains(username)) {
+              idSala = item;
+              String removerMeuId = idSala.replaceAll('$username', '');
+              nomeDaSala = removerMeuId.replaceAll('-', '');
+              listaDeNomes.add(nomeDaSala);
+            }
+          },
+        );
+      }
+      List listarUltimosDados = List();
+      listarUltimosDados =
+          await obterUltimaMsgHora(salas: listaDeSalas, usernome: username);
+
+      for (int x = 0; x < listarUltimosDados.length;) {
+        ultimaMsg.add(listarUltimosDados[x]);
+        x = x + 2;
+      }
+      for (int i = 1; i < listarUltimosDados.length;) {
+        ultimaHora.add(listarUltimosDados[i]);
+        i = i + 2;
+      }
+
+      List listaDeEmails = List();
+      List<Widget> listaDeAvatars = List();
+      CircleAvatar cAvatar;
+      for (var username in listaDeNomes) {
+        final query = await _firestore
+            .collection('Utilizador')
+            .where('username', isEqualTo: username)
+            .get();
+        query.docs.forEach((element) {
+          listaDeEmails.add(element.id);
+        });
+      }
+
+      for (var email in listaDeEmails) {
+        listaDeAvatars
+            .add(await FirebaseStorageRepo().obterUserAvatar(user: email));
+      }
+      // cAvatar = await FirebaseStorageRepo().obterUserAvatar(user: nomeAvatar);
+      return ListView.builder(
+          shrinkWrap: true,
+          itemCount: listaDeNomes.length,
+          itemBuilder: (BuildContext _, int index) {
+            return mensagemCard(
+              nome: listaDeNomes[index],
+              context: contexto,
+              imagemAvatar: listaDeAvatars[index],
+              ultimaMsg: ultimaMsg[index],
+              horas: ultimaHora[index],
+            );
+          });
+    } catch (e) {
+      print(e);
+    }
+  }
 
   Future<String> getUsernameDestino(String email) async {
     String nomeDestino;
@@ -165,7 +262,7 @@ class ServicosFirestoreDatabase {
     }
   }
 
-  Future<List<String>> obterDadosUltimaMensagem(String nomeSala) async {
+  obterDadosUltimaMensagem(String nomeSala) async {
     try {
       QuerySnapshot query = await _firestore
           .collection('Mensagens')

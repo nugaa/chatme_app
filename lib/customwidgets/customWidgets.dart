@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:chatme/customwidgets/textstylescustom.dart';
-import 'package:chatme/networking/firebase_storage.dart';
+import 'package:chatme/networking/firebase_storage_repo.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
 import 'package:chatme/networking/servicos_firestore_database.dart';
 import 'package:chatme/telas/telamensagens.dart';
@@ -140,7 +140,7 @@ Column msgAvatar({String imagempath, Color cor}) {
 }
 
 Card mensagemCard(
-    {@required String imagemPath,
+    {@required CircleAvatar imagemAvatar,
     @required String nome,
     String ultimaMsg,
     String horas,
@@ -157,10 +157,7 @@ Card mensagemCard(
         vertical: 6.0,
       ),
       child: ListTile(
-        leading: msgAvatar(
-          imagempath: imagemPath,
-          cor: corOnline,
-        ),
+        leading: imagemAvatar,
         title: Text(
           nome,
           style: textFieldStyle(
