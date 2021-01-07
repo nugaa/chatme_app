@@ -36,7 +36,6 @@ class _TelaHomeState extends State<TelaHome> {
 
   @override
   void initState() {
-    // TODO: implement initState
     emailUser();
     super.initState();
   }

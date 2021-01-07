@@ -123,7 +123,6 @@ Column msgAvatar({String imagempath, Color cor}) {
     children: <Widget>[
       CircleAvatar(
         radius: 28,
-        //TODO: imagem muda consoante utilizador
         backgroundImage: AssetImage(imagempath),
         child: Align(
           alignment: Alignment.bottomRight,
