@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:chatme/constantes.dart';
 import 'package:chatme/customwidgets/alertcustom.dart';
 import 'package:chatme/networking/firebase_storage_repo.dart';
+import 'package:chatme/telas/telamensagens.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:chatme/customwidgets/customWidgets.dart';
@@ -25,17 +26,19 @@ class ServicosFirestoreDatabase {
         listaDeDados = await obterDadosUltimaMensagem(nomeSala);
 
         for (int i = 0; i < listaDeDados.length; i++) {
-          listaFinal.add(listaDeDados[i]);
+          if (listaDeDados.isNotEmpty) {
+            listaFinal.add(listaDeDados[i]);
+          }
         }
       }
     }
+
     return listaFinal;
   }
 
   Future<Widget> listarSalasMensagensUtilizador({
     BuildContext contexto,
     String username,
-    List listaDeDados,
   }) async {
     String nomeDaSala;
     String idSala;
@@ -43,6 +46,7 @@ class ServicosFirestoreDatabase {
     List listaDeNomes = [];
     List ultimaMsg = [];
     List ultimaHora = [];
+    List listaDaSalaDoUser = [];
 
     try {
       listaDeSalas = await salaMensagensId();
@@ -51,17 +55,33 @@ class ServicosFirestoreDatabase {
         listaDeSalas.forEach(
           (item) async {
             if (item.contains(username)) {
+              String result;
               idSala = item;
-              String removerMeuId = idSala.replaceAll('$username', '');
-              nomeDaSala = removerMeuId.replaceAll('-', '');
-              listaDeNomes.add(nomeDaSala);
+              int posMUser = idSala.indexOf(username);
+              int pos = idSala.indexOf('-');
+
+              if (posMUser > pos) {
+                result = idSala.substring(pos + 1, idSala.length);
+              } else if (posMUser < pos) {
+                result = idSala.substring(0, pos);
+              }
+              String salaNome;
+              if (result == username) {
+                salaNome = item;
+                listaDaSalaDoUser.add(salaNome);
+              }
+              if (salaNome != null) {
+                String removerMeuId = salaNome.replaceAll('$username', '');
+                nomeDaSala = removerMeuId.replaceAll('-', '');
+                listaDeNomes.add(nomeDaSala);
+              }
             }
           },
         );
       }
       List listarUltimosDados = List();
-      listarUltimosDados =
-          await obterUltimaMsgHora(salas: listaDeSalas, usernome: username);
+      listarUltimosDados = await obterUltimaMsgHora(
+          salas: listaDaSalaDoUser, usernome: username);
 
       for (int x = 0; x < listarUltimosDados.length;) {
         ultimaMsg.add(listarUltimosDados[x]);
@@ -74,7 +94,6 @@ class ServicosFirestoreDatabase {
 
       List listaDeEmails = List();
       List<Widget> listaDeAvatars = List();
-      CircleAvatar cAvatar;
       for (var username in listaDeNomes) {
         final query = await _firestore
             .collection('Utilizador')
@@ -89,19 +108,35 @@ class ServicosFirestoreDatabase {
         listaDeAvatars
             .add(await FirebaseStorageRepo().obterUserAvatar(user: email));
       }
-      // cAvatar = await FirebaseStorageRepo().obterUserAvatar(user: nomeAvatar);
-      return ListView.builder(
-          shrinkWrap: true,
-          itemCount: listaDeNomes.length,
-          itemBuilder: (BuildContext _, int index) {
-            return mensagemCard(
-              nome: listaDeNomes[index],
-              context: contexto,
-              imagemAvatar: listaDeAvatars[index],
-              ultimaMsg: ultimaMsg[index],
-              horas: ultimaHora[index],
-            );
-          });
+
+      if (listaDeNomes.isNotEmpty &&
+          listaDeAvatars.isNotEmpty &&
+          ultimaMsg.isNotEmpty &&
+          ultimaHora.isNotEmpty) {
+        return ListView.builder(
+            shrinkWrap: true,
+            itemCount: listaDeNomes.length,
+            itemBuilder: (BuildContext _, int index) {
+              return InkWell(
+                onTap: () {
+                  Navigator.pushReplacementNamed(contexto, TelaMensagens.id,
+                      arguments: {
+                        'nome': listaDeNomes[index],
+                        'avatar': listaDeAvatars[index]
+                      });
+                  ServicosFirestoreDatabase()
+                      .criarSalaChat(username, listaDeNomes[index]);
+                },
+                child: mensagemCard(
+                  nome: listaDeNomes[index],
+                  context: contexto,
+                  imagemAvatar: listaDeAvatars[index],
+                  ultimaMsg: ultimaMsg[index],
+                  horas: ultimaHora[index],
+                ),
+              );
+            });
+      }
     } catch (e) {
       print(e);
     }
@@ -225,14 +260,36 @@ class ServicosFirestoreDatabase {
     return _urlMsg;
   }
 
+  Future apagarSalaChat(String mUser, String destino) async {
+    String _salaNome;
+    _salaNome = await verificarSalaExiste(enviadoPor: mUser, destino: destino);
+
+    var query = await _firestore.collection('Mensagens').doc(_salaNome).get();
+
+    if (query.exists) {
+      final existe = await query.reference.collection('Conversa').get();
+      if (existe.docs.isEmpty) {
+        _firestore
+            .collection('Mensagens')
+            .doc(_salaNome)
+            .delete()
+            .then((value) {
+          print('Apagado com sucesso!');
+        });
+      }
+    }
+  }
+
   Future criarSalaChat(String mUser, String destino) async {
     String _salaNome;
     _salaNome = await verificarSalaExiste(enviadoPor: mUser, destino: destino);
 
-    _firestore
-        .collection('Mensagens')
-        .doc(_salaNome)
-        .set({'obj': 'sala de chat'});
+    if (_salaNome.isNotEmpty) {
+      _firestore
+          .collection('Mensagens')
+          .doc(_salaNome)
+          .set({'obj': 'sala de chat'});
+    }
   }
 
   Future enviarMensagem(

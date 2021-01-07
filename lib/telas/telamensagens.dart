@@ -51,11 +51,9 @@ class _TelaMensagensState extends State<TelaMensagens> {
               titulo: dados['nome'],
               iconeSufixo: FontAwesomeIcons.phoneAlt,
               onTapp: () {
+                ServicosFirestoreDatabase()
+                    .apagarSalaChat(_meuUsername, dados['nome']);
                 Navigator.pushReplacementNamed(context, TelaHome.id);
-                //     .then((value) {
-                //   setState(() {
-                //   });
-                // });
               },
             ),
             SizedBox(

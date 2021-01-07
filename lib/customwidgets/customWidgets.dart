@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:chatme/customwidgets/textstylescustom.dart';
 import 'package:chatme/networking/firebase_storage_repo.dart';
 import 'package:chatme/networking/servicos_firebase_auth.dart';
@@ -17,8 +16,8 @@ Container customAppbar(
     Widget imagemAvatar,
     IconData iconePrefixo,
     @required IconData iconeSufixo,
-    @required Function onTapp,
-    @required Function onTap2}) {
+    Function onTapp,
+    Function onTap2}) {
   return Container(
     color: Colors.white12,
     padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
